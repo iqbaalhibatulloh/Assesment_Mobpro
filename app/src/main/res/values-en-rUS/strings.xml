@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mini Project</string>
+    <string name="appName">Financial Records</string>
+    <string name="list_kosong">No data yet</string>
+    <string name="tambah_catatan">Add note</string>
+    <string name="input_invalid">Cannot be empty.</string>
+    <string name="nominal">Amount</string>
+    <string name="pemasukan">Income</string>
+    <string name="pengeluaran">Expense</string>
+    <string name="tambah">Add</string>
+    <string name="keterangan">Description</string>
+    <string name="share_all_data">Share All Data</string>
+    <string name="share_template">Description: %1$s\nExpense Amount: %2$s\nDate: %3$s</string>
+    <string name="total_saldo">Total Balance: %1$s</string>
+    <string name="total_pemasukan">Total Income: %1$s</string>
+    <string name="total_pengeluaran">Total Expense: %1$s</string>
+    <string name="kembali">Back</string>
+    <string name="tentang_aplikasi">About App</string>
+    <string name="copyright">KasPri is an application to track expenses and also our balance\n\n
+    This application is created to fulfill one of the tasks of Mini Project #1 Mobpro 1.\n\n
+    Copyright © 2024 Iqbaal H 6706220110\n
+    ALL rights reserved</string>
+    <string name="foto_profil">Profile Picture</string>
+
+</resources>
