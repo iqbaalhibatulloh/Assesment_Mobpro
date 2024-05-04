@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,29 +22,21 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Money
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Money
 import androidx.compose.material.icons.outlined.Payment
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -53,13 +44,11 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -68,10 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -80,7 +66,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import org.d3if0110.miniproject.R
-import org.d3if0110.miniproject.model.MainScreenModel
 import org.d3if0110.miniproject.model.Note
 import org.d3if0110.miniproject.model.TabItem
 import org.d3if0110.miniproject.navigation.Screen
@@ -95,8 +80,6 @@ import kotlin.math.absoluteValue
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController, mainScreenModel: MainScreenModel) {
-    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -121,31 +104,25 @@ fun MainScreen(navController: NavHostController, mainScreenModel: MainScreenMode
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                showBottomSheet = true
-            }) {
+            FloatingActionButton(onClick = {}) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(id = R.string.tambah_catatan),
+                    contentDescription = stringResource(id = R.string.tambah_note),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
     ) { padding ->
-        ScreenContent(Modifier.padding(padding), mainScreenModel, showBottomSheet) {
-            showBottomSheet = false
-        }
+        ScreenContent(Modifier.padding(padding), mainScreenModel)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ScreenContent(
     modifier: Modifier,
     mainScreenModel: MainScreenModel,
-    showBottomSheet: Boolean,
-    onDismissRequest: () -> Unit
 ) {
 
     val tabItems = listOf(
@@ -174,19 +151,6 @@ fun ScreenContent(
     }
 
     val data = mainScreenModel.data.observeAsState()
-    val sheetState = rememberModalBottomSheetState()
-
-    var nominal by rememberSaveable { mutableStateOf("") }
-    var nominalError by rememberSaveable { mutableStateOf(false) }
-    var selectedStatus by rememberSaveable { mutableStateOf("Pemasukan") }
-
-    var keterangan by rememberSaveable { mutableStateOf("") }
-    var keteranganError by rememberSaveable { mutableStateOf(false) }
-
-    val radioOptions = listOf(
-        stringResource(R.string.pemasukan),
-        stringResource(R.string.pengeluaran)
-    )
 
     val context = LocalContext.current
 
@@ -275,7 +239,7 @@ fun ScreenContent(
                     if (pengeluaranData != null) {
                         shareData(context, pengeluaranData)
                     } else {
-                        Toast.makeText(context, R.string.list_kosong, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.list_kosong, Toast.LENGTH_LONG).show()
                     }
                 },
                     icon = {
@@ -328,112 +292,6 @@ fun ScreenContent(
             }
         }
     }
-
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                onDismissRequest()
-            },
-            sheetState = sheetState,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                OutlinedTextField(
-                    value = nominal,
-                    onValueChange = { nominal = it },
-                    label = { Text(text = stringResource(R.string.nominal)) },
-                    isError = nominalError,
-                    trailingIcon = { IconPicker(nominalError, "") },
-                    supportingText = { ErrorHint(nominalError) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
-                    ),
-                    leadingIcon = {
-                        Text(text = "Rp.")
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.size(10.dp))
-                OutlinedTextField(
-                    value = keterangan,
-                    onValueChange = { keterangan = it },
-                    label = { Text(text = stringResource(R.string.keterangan)) },
-                    isError = keteranganError,
-                    trailingIcon = { IconPicker(keteranganError, "") },
-                    supportingText = { ErrorHint(keteranganError) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done
-                    ),
-                    leadingIcon = {
-                        Icon(imageVector = Icons.Default.Info, contentDescription = "")
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.size(10.dp))
-                Row(
-                    modifier = Modifier
-                        .padding(top = 6.dp)
-                        .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
-                ) {
-                    radioOptions.forEach { text ->
-                        StatusOption(
-                            label = text,
-                            isSelected = selectedStatus == text,
-                            modifier = Modifier
-                                .selectable(
-                                    selected = selectedStatus == text,
-                                    onClick = {
-                                        selectedStatus = text
-                                    },
-                                    role = Role.RadioButton
-                                )
-                                .weight(1f)
-                                .padding(16.dp)
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.size(10.dp))
-                Button(
-                    onClick = {
-                        nominalError = (nominal == "" || nominal == "0")
-                        keteranganError = (keterangan == "")
-                        if (nominalError || keteranganError) return@Button
-
-                        if (selectedStatus == "Pemasukan") {
-                            mainScreenModel.addNote(
-                                Note(
-                                    keterangan,
-                                    nominal.toFloat(),
-                                    LocalDate.now(),
-                                    selectedStatus
-                                )
-                            )
-                        } else {
-                            mainScreenModel.addNote(
-                                Note(
-                                    keterangan,
-                                    nominal.toFloat() * -1,
-                                    LocalDate.now(),
-                                    selectedStatus
-                                )
-                            )
-                        }
-                    }, modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 40.dp)
-                ) {
-                    Text(text = stringResource(R.string.tambah))
-                }
-            }
-        }
-    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -459,7 +317,7 @@ fun ItemNote(note: Note, onClick: () -> Unit) {
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = formatDate(note.tanggal),
+                text = note.tanggal,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.End
             )
@@ -486,7 +344,7 @@ private fun buildPengeluaranString(context: Context, pengeluaranList: List<Note>
             R.string.share_template,
             pengeluaran.keterangan,
             formatCurrency(pengeluaran.nominal),
-            formatDate(pengeluaran.tanggal)
+            pengeluaran.tanggal
         )
         stringBuilder.append(pengeluaranStr).append("\n\n")
     }
@@ -516,26 +374,10 @@ fun PrevItem() {
         note = Note(
             "asknskna",
             4000f,
-            LocalDate.now(),
+            formatDate(LocalDate.now()),
             "Pemasukan"
         )
     ) {}
-}
-
-@Composable
-fun IconPicker(isError: Boolean, unit: String) {
-    if (isError) {
-        Icon(imageVector = Icons.Filled.Warning, contentDescription = null)
-    } else {
-        Text(text = unit)
-    }
-}
-
-@Composable
-fun ErrorHint(isError: Boolean) {
-    if (isError) {
-        Text(text = stringResource(id = R.string.input_invalid))
-    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

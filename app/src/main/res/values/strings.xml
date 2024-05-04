@@ -2,7 +2,8 @@
     <string name="app_name">Mini Project</string>
     <string name="appName">Pencatatan Keuangan</string>
     <string name="list_kosong">Belum ada data</string>
-    <string name="tambah_catatan">Tambah catatan</string>
+    <string name="tambah_note">Tambah catatan keuangan</string>
+    <string name="edit_note">Edit catatan keuangan</string>
     <string name="input_invalid">Tidak boleh kosong.</string>
     <string name="nominal">Nominal</string>
     <string name="pemasukan">Pemasukan</string>
@@ -18,4 +19,5 @@
     <string name="tentang_aplikasi">Tentang Aplikasi</string>
     <string name="copyright">KasPri merupakan sebuah aplikasi untuk mengetahui pengeluaran dan juga saldo yang kita miliki \n\nAplikasi ini dibuat untuk memenuhi salah satu tugas Mini Project #1 Mobpro 1.\n\n Copyright © 2024 Iqbaal H 6706220110\nALL rights reserved</string>
     <string name="foto_profil">Foto Profil</string>
+    <string name="simpan">Simpan</string>
 </resources>

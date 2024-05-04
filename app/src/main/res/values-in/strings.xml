@@ -3,7 +3,7 @@
     <string name="app_name">Mini Project</string>
     <string name="appName">Pencatatan Keuangan</string>
     <string name="list_kosong">Belum ada data</string>
-    <string name="tambah_catatan">Tambah catatan</string>
+    <string name="tambah_note">Tambah catatan</string>
     <string name="input_invalid">Tidak boleh kosong.</string>
     <string name="nominal">Nominal</string>
     <string name="pemasukan">Pemasukan</string>
