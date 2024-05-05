@@ -5,12 +5,12 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "note")
-data class Note(
+data class Record (
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val keterangan: String,
     val nominal: Float,
-    val tanggal: String,
+    val tanggal: Long,
     val status: String
 )
 

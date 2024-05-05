@@ -5,22 +5,22 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import org.d3if0110.miniproject.model.Note
+import org.d3if0110.miniproject.model.Record
 
 @Dao
-interface NoteDao {
+interface RecordDao {
 
     @Insert
-    suspend fun insert(note: Note)
+    suspend fun insert(record: Record)
 
     @Update
-    suspend fun update(note: Note)
+    suspend fun update(record: Record)
 
-    @Query("SELECT * FROM note ORDER BY id DESC")
-    fun getNote(): Flow<List<Note>>
+    @Query("SELECT * FROM note ORDER BY tanggal DESC")
+    fun getNote(): Flow<List<Record>>
 
     @Query("SELECT * FROM note WHERE id = :id")
-    suspend fun getNoteById(id: Long): Note?
+    suspend fun getNoteById(id: Long): Record?
 
     @Query("DELETE FROM note WHERE id = :id")
     suspend fun deleteById(id: Long)

@@ -4,26 +4,26 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import org.d3if0110.miniproject.model.Note
+import org.d3if0110.miniproject.model.Record
 
-@Database(entities = [Note::class], version = 1, exportSchema = false)
-abstract class NoteDb : RoomDatabase() {
+@Database(entities = [Record::class], version = 1, exportSchema = false)
+abstract class RecordDb : RoomDatabase() {
 
-    abstract val dao: NoteDao
+    abstract val dao: RecordDao
     companion object {
 
         @Volatile
-        private var INSTANCE: NoteDb? = null
+        private var INSTANCE: RecordDb? = null
 
-        fun getInstance(context: Context): NoteDb {
+        fun getInstance(context: Context): RecordDb {
             synchronized(this) {
                 var instance = INSTANCE
 
                 if (instance == null) {
                     instance = Room.databaseBuilder(
                         context.applicationContext,
-                        NoteDb::class.java,
-                        "note.db"
+                        RecordDb::class.java,
+                        "record.db"
                     ).build()
                     INSTANCE = instance
                 }
