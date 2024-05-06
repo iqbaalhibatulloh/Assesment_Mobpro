@@ -4,12 +4,12 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import org.d3if0110.miniproject.database.NoteDao
+import org.d3if0110.miniproject.database.RecordDao
 import org.d3if0110.miniproject.ui.screen.DetailViewModel
 import org.d3if0110.miniproject.ui.screen.MainViewModel
 
 class ViewModelFactory(
-    private val dao: NoteDao
+    private val dao: RecordDao
 ) : ViewModelProvider.Factory {
     @RequiresApi(Build.VERSION_CODES.O)
     @Suppress("unchecked_cast")

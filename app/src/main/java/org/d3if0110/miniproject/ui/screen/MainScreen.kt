@@ -6,6 +6,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,24 +14,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Money
-import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Money
-import androidx.compose.material.icons.outlined.Payment
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -46,40 +44,52 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.d3if0110.miniproject.R
-import org.d3if0110.miniproject.model.Note
-import org.d3if0110.miniproject.model.TabItem
+import org.d3if0110.miniproject.database.RecordDb
+import org.d3if0110.miniproject.model.Record
 import org.d3if0110.miniproject.navigation.Screen
+import org.d3if0110.miniproject.util.SettingsDataStore
+import org.d3if0110.miniproject.util.ViewModelFactory
 import java.text.NumberFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
 import java.util.Currency
+import java.util.Date
 import java.util.Locale
 import kotlin.math.absoluteValue
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController, mainScreenModel: MainScreenModel) {
+fun MainScreen(navController: NavHostController, isDark: Boolean) {
+    val context = LocalContext.current
+    val db = RecordDb.getInstance(context)
+    val factory = ViewModelFactory(db.dao)
+    val viewModel: MainViewModel = viewModel(factory = factory)
+
+    val dataStore = SettingsDataStore(LocalContext.current)
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -91,6 +101,24 @@ fun MainScreen(navController: NavHostController, mainScreenModel: MainScreenMode
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
                 actions = {
+                    IconButton(onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            dataStore.saveTheme(!isDark)
+                        }
+                    }) {
+                        Icon(
+                            painter = painterResource(
+                                if (isDark) R.drawable.baseline_light_mode_24
+                                else R.drawable.baseline_dark_mode_24
+                            ),
+                            contentDescription = stringResource(
+                                if (isDark) R.string.light
+                                else R.string.dark
+                            ),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
                     IconButton(onClick = {
                         navController.navigate(Screen.About.route)
                     }) {
@@ -104,16 +132,18 @@ fun MainScreen(navController: NavHostController, mainScreenModel: MainScreenMode
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {}) {
+            FloatingActionButton(onClick = {
+                navController.navigate(Screen.FormBaru.route)
+            }) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(id = R.string.tambah_note),
+                    contentDescription = stringResource(id = R.string.tambah_record),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
     ) { padding ->
-        ScreenContent(Modifier.padding(padding), mainScreenModel)
+        ScreenContent(Modifier.padding(padding), viewModel, context, navController)
     }
 }
 
@@ -122,21 +152,12 @@ fun MainScreen(navController: NavHostController, mainScreenModel: MainScreenMode
 @Composable
 fun ScreenContent(
     modifier: Modifier,
-    mainScreenModel: MainScreenModel,
+    viewModel: MainViewModel,
+    context: Context,
+    navController: NavHostController
 ) {
 
-    val tabItems = listOf(
-        TabItem(
-            title = "Pemasukan",
-            unSelectedIcon = Icons.Outlined.Money,
-            selectedIcon = Icons.Filled.Money
-        ),
-        TabItem(
-            title = "Pengeluaran",
-            unSelectedIcon = Icons.Outlined.Payment,
-            selectedIcon = Icons.Filled.Payment
-        )
-    )
+    val tabItems = MainViewModel.tabItems
 
     var selectedTabIndex by rememberSaveable {
         mutableIntStateOf(0)
@@ -150,64 +171,68 @@ fun ScreenContent(
         selectedTabIndex = pagerState.currentPage
     }
 
-    val data = mainScreenModel.data.observeAsState()
-
-    val context = LocalContext.current
+    val data by viewModel.data.collectAsState()
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 0.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Column(
             modifier = Modifier
-                .weight(0.5f)
+                .weight(0.6f)
                 .fillMaxWidth()
-                .background(Color.Gray)
-                .padding(8.dp),
+                .padding(8.dp)
+                .background(color = MaterialTheme.colorScheme.primary),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = stringResource(
                     R.string.total_saldo,
-                    data.value?.sumOf { it.nominal.toDouble() }
-                        ?.let { formatCurrency(it.toFloat()) } ?: "Rp. 0"), color = Color.White)
-            Spacer(modifier = Modifier.size(10.dp))
+                    formatCurrency(data.sumOf { it.nominal.toDouble() }.toFloat()),
+                ),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = stringResource(
                     R.string.total_pemasukan,
-                    data.value?.filter { it.nominal > 0 }?.sumOf { it.nominal.toDouble() }
-                        ?.let {
+                    data.filter { it.nominal > 0 }.sumOf { it.nominal.toDouble() }
+                        .let {
                             formatCurrency(
                                 it
                                     .toFloat()
                             )
-                        } ?: "Rp."), Modifier.weight(1f), color = Color.White)
-            Spacer(modifier = Modifier.size(10.dp))
+                        }),
+                color = MaterialTheme.colorScheme.onPrimary
+                )
+            Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = stringResource(
                     R.string.total_pengeluaran,
-                    data.value?.filter { it.nominal < 0 }?.sumOf { it.nominal.toDouble() }
-                        ?.let {
+                    data.filter { it.nominal < 0 }.sumOf { it.nominal.toDouble() }
+                        .let {
                             formatCurrency(
                                 it
                                     .toFloat()
                             )
-                        } ?: "Rp. 0"), Modifier.weight(1f), color = Color.White)
+                        }),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
         }
-        Spacer(modifier = Modifier.size(15.dp))
+
         Column(
             modifier = Modifier
                 .weight(3f)
                 .fillMaxWidth()
-                .background(Color.Gray.copy(alpha = 0.5f))
         ) {
             TabRow(
-                selectedTabIndex = selectedTabIndex
+                selectedTabIndex = selectedTabIndex,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 tabItems.forEachIndexed { index, item ->
                     Tab(
@@ -226,22 +251,22 @@ fun ScreenContent(
                                 imageVector = if (index == selectedTabIndex) item.selectedIcon else item.unSelectedIcon,
                                 contentDescription = item.title
                             )
-                        }
+                        },
+                        modifier = Modifier.background(MaterialTheme.colorScheme.primary),
                     )
                 }
                 Tab(selected = false, onClick = {
                     val pengeluaranData =
-                        data.value?.let { it ->
-                            buildPengeluaranString(
-                                context,
-                                it.filter { it.status == "Pengeluaran" })
-                        } // Ganti dengan list data pengeluaran
+                        buildPengeluaranString(
+                            context,
+                            data.filter { it.status == "Pengeluaran"})
                     if (pengeluaranData != null) {
                         shareData(context, pengeluaranData)
                     } else {
-                        Toast.makeText(context, R.string.list_kosong, Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, R.string.list_empty_expense, Toast.LENGTH_SHORT).show()
                     }
                 },
+                    modifier = Modifier.background(MaterialTheme.colorScheme.primary),
                     icon = {
                         Icon(
                             imageVector = Icons.Default.Share,
@@ -249,7 +274,7 @@ fun ScreenContent(
                         )
                     },
                     text = {
-                        Text(text = "Share Pengeluaran")
+                        Text(text = stringResource(R.string.share_pengeluaran))
                     }
                 )
             }
@@ -260,31 +285,44 @@ fun ScreenContent(
                     .weight(1f)
             ) { index ->
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize()
+                        .background(MaterialTheme.colorScheme.secondary)
                 ) {
-                    if (data.value?.isEmpty() == true) {
+                    val filteredData =
+                        data.filter { it.status == tabItems[index].title }
+                    if (filteredData.isEmpty()) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize(),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(text = stringResource(id = R.string.list_kosong))
+                            Image(painter = painterResource(id = R.drawable.empty_removebg_preview), contentDescription = "", modifier = Modifier.aspectRatio(2f))
+                            Spacer(modifier = Modifier.size(8.dp))
+                            if(tabItems[index].title == "Pemasukan") {
+                                Text(
+                                    text = stringResource(R.string.list_empty_income),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                            } else {
+                                Text(
+                                    text = stringResource(R.string.list_empty_expense),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                    )
+                            }
                         }
                     } else {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = 64.dp)
+                            contentPadding = PaddingValues(bottom = 84.dp)
                         ) {
-                            val filteredData =
-                                data.value?.filter { it.status == tabItems[index].title }
-
-                            filteredData?.let {
-                                itemsIndexed(it.reversed()) { _, note ->
-                                    // Gunakan indeks yang sudah dibalik
-                                    ItemNote(note = note) {}
-                                    Divider()
+                            items(filteredData) { note ->
+                                ItemNote(record = note) {
+                                    navController.navigate(Screen.FormUbah.withId(note.id))
                                 }
+                                Divider()
                             }
                         }
                     }
@@ -296,7 +334,7 @@ fun ScreenContent(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ItemNote(note: Note, onClick: () -> Unit) {
+fun ItemNote(record: Record, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -304,22 +342,25 @@ fun ItemNote(note: Note, onClick: () -> Unit) {
             .padding(16.dp),
     ) {
         Text(
-            text = note.keterangan,
+            text = record.keterangan,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSecondary
         )
         Row {
             Text(
                 modifier = Modifier.weight(1f),
-                text = formatCurrency(note.nominal),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                text = formatCurrency(record.nominal),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSecondary
             )
             Text(
-                text = note.tanggal,
+                text = formatDate(Date(record.tanggal)),
                 modifier = Modifier.weight(1f),
-                textAlign = TextAlign.End
+                textAlign = TextAlign.End,
+                color = MaterialTheme.colorScheme.onSecondary
             )
         }
     }
@@ -335,21 +376,30 @@ private fun shareData(context: Context, message: String) {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-private fun buildPengeluaranString(context: Context, pengeluaranList: List<Note>): String {
-    val stringBuilder = StringBuilder()
-    stringBuilder.append("Laporan Pengeluaran: \n\n")
-    for (pengeluaran: Note in pengeluaranList) {
-        val pengeluaranStr = context.getString(
-            R.string.share_template,
-            pengeluaran.keterangan,
-            formatCurrency(pengeluaran.nominal),
-            pengeluaran.tanggal
-        )
-        stringBuilder.append(pengeluaranStr).append("\n\n")
-    }
-    return stringBuilder.toString()
+private fun formatDate(date: Date): String {
+    return SimpleDateFormat("EEEE, dd/MM/yyyy", Locale("in", "ID")).format(date)
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun buildPengeluaranString(context: Context, pengeluaranList: List<Record>): String? {
+    return if(pengeluaranList.isNotEmpty()){
+        val stringBuilder = StringBuilder()
+        stringBuilder.append("Laporan Pengeluaran: \n\n")
+        for (pengeluaran: Record in pengeluaranList) {
+            val pengeluaranStr = context.getString(
+                R.string.share_template,
+                pengeluaran.keterangan,
+                pengeluaran.nominal.toString(),
+                Date(pengeluaran.tanggal),
+            )
+            stringBuilder.append(pengeluaranStr).append("\n\n")
+        }
+        stringBuilder.toString()
+    } else {
+        null
+    }
+}
+
 
 @Composable
 fun StatusOption(label: String, isSelected: Boolean, modifier: Modifier) {
@@ -369,32 +419,8 @@ fun StatusOption(label: String, isSelected: Boolean, modifier: Modifier) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
-fun PrevItem() {
-    ItemNote(
-        note = Note(
-            "asknskna",
-            4000f,
-            formatDate(LocalDate.now()),
-            "Pemasukan"
-        )
-    ) {}
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
 fun PrevMainScreen() {
-    MainScreen(navController = rememberNavController(), MainScreenModel())
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun formatDate(date: LocalDate): String {
-    return date.format(
-        DateTimeFormatter.ofPattern(
-            "EEEE, dd/MM/yyyy",
-            Locale("in", "ID")
-        )
-    )
+    MainScreen(navController = rememberNavController(), false)
 }
 
 fun formatCurrency(amount: Float): String {
