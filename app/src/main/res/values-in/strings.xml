@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mini Project</string>
-    <string name="appName">Pencatatan Keuangan</string>
+    <string name="appName">KasPri</string>
     <string name="list_kosong">Belum ada data</string>
     <string name="tambah_record">Tambah catatan keuangan</string>
     <string name="edit_record">Edit catatan keuangan</string>
