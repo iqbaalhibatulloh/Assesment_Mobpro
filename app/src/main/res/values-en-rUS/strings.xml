@@ -1,35 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Mini Project</string>
-    <string name="appName">KasPri</string>
-    <string name="list_kosong">No data yet</string>
-    <string name="tambah_record">Add financial record</string>
-    <string name="edit_record">Edit financial record</string>
-    <string name="input_invalid">Cannot be empty.</string>
-    <string name="nominal">Amount</string>
-    <string name="pemasukan">Income</string>
-    <string name="pengeluaran">Expense</string>
-    <string name="tambah">Add</string>
-    <string name="keterangan">Description</string>
-    <string name="share_all_data">Share All Data</string>
-    <string name="share_template">Description: %1$s\nExpense Amount: %2$s\nDate: %3$s</string>
-    <string name="total_saldo">Total Balance: %1$s</string>
-    <string name="total_pemasukan">Total Income: %1$s</string>
-    <string name="total_pengeluaran">Total Expense: %1$s</string>
-    <string name="kembali">Back</string>
-    <string name="tentang_aplikasi">About the Application</string>
-    <string name="copyright">KasPri is an application to track expenses and balance.\n\nThis application is created to fulfill one of the Mini Project #1 assignments for Mobpro 1 course.\n\n Copyright © 2024 Iqbaal H 6706220110\nALL rights reserved</string>
-    <string name="foto_profil">Profile Picture</string>
-    <string name="simpan">Save</string>
-    <string name="share_pengeluaran">Share Expense</string>
-    <string name="invalid">Description and amount cannot be empty.</string>
-    <string name="lainnya">Other options</string>
-    <string name="hapus">Delete record</string>
-    <string name="pesan_hapus">Delete this financial record?</string>
-    <string name="tombol_hapus">Delete</string>
-    <string name="tombol_batal">Cancel</string>
-    <string name="list_empty_income">No income yet</string>
-    <string name="list_empty_expense">No expense yet</string>
-    <string name="dark">Dark</string>
-    <string name="light">Light</string>
+
 </resources>
