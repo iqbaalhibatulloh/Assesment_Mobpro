@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <string name="app_name">My Favorite Art</string>
+    <string name="appName">MyFavoriteArt</string>
+    <string name="list_kosong">No data yet</string>
+    <string name="kembali">Back</string>
+    <string name="tentang_aplikasi">About the Application</string>
+    <string name="copyright">This application is called "My Favorite Art" - a creative app that allows you to express your appreciation for art! With "My Favorite Art", you can easily create, view, and delete your favorite art collections. Fill in information such as title, artist, type of artwork, and add an image to bring your personal gallery to life.\n\n #3 assignments for Mobpro 1 course.\n\n Copyright © 2024 Iqbaal H 6706220110\nALL rights reserved</string>
+    <string name="foto_profil">Profile Picture</string>
+    <string name="simpan">Save</string>
+    <string name="dark">Dark</string>
+    <string name="light">Light</string>
+    <string name="gambar">Image %1$s</string>
+    <string name="error">Failed to load data.. Connection error.</string>
+    <string name="try_again">Try again</string>
+    <string name="profil">Profile</string>
+    <string name="tutup">Close</string>
+    <string name="logout">Logout</string>
+    <string name="tambah_art">Add art</string>
+    <string name="nama">Name</string>
+    <string name="nama_latin">Latin name</string>
+    <string name="batal">Cancel</string>
+    <string name="delete_art">Delete art</string>
+    <string name="hapus">Delete</string>
+    <string name="judul">Title</string>
+    <string name="artis">Artist</string>
+    <string name="jenis_karya">Type of Artwork</string>
+    <string name="art_list_empty">Art list empty</string>
 </resources>
