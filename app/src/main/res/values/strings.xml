@@ -1,13 +1,12 @@
 <resources>
-    <string name="app_name">Mini Project</string>
+    <string name="app_name">My Favorite Art</string>
     <string name="appName">MyFavoriteArt</string>
     <string name="list_kosong">No data yet</string>
     <string name="kembali">Back</string>
     <string name="tentang_aplikasi">About the Application</string>
-    <string name="copyright">#1 assignments for Mobpro 1 course.\n\n Copyright © 2024 Iqbaal H 6706220110\nALL rights reserved</string>
+    <string name="copyright">Aplikasi ini bernama "My Favorite Art" - aplikasi kreatif yang memungkinkan Anda mengekspresikan apresiasi Anda terhadap seni! Dengan "My Favorite Art", Anda dapat dengan mudah membuat, melihat, dan menghapus koleksi karya seni favorit Anda. Isi informasi seperti judul, artis, jenis karya, dan tambahkan gambar karyanya untuk menghidupkan galeri pribadi Anda.\n\n #3 assignments for Mobpro 1 course.\n\n Copyright © 2024 Iqbaal H 6706220110\nALL rights reserved</string>
     <string name="foto_profil">Profile Picture</string>
     <string name="simpan">Save</string>
-    <string name="invalid">Description and amount cannot be empty.</string>
     <string name="dark">Dark</string>
     <string name="light">Light</string>
     <string name="gambar">Gambar %1$s</string>
@@ -22,4 +21,8 @@
     <string name="batal">Batal</string>
     <string name="delete_art">Hapus art</string>
     <string name="hapus">Hapus</string>
+    <string name="judul">judul</string>
+    <string name="artis">artis</string>
+    <string name="jenis_karya">Jenis Karya</string>
+    <string name="art_list_empty">Art list empty</string>
 </resources>
